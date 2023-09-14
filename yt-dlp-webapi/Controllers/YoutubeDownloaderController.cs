@@ -21,6 +21,10 @@ public class YoutubeDownloaderController : ControllerBase
     public string Download(string url)
     {
         DownloadProcess downloadProcess = new DownloadProcess(url);
+        Task.Run(async () =>
+        {
+            downloadProcess.start();
+        });
         return "a";
     }
 }

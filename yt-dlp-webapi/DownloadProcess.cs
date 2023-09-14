@@ -15,20 +15,23 @@ public class DownloadProcess
         processStartInfo.UseShellExecute = false;
         processStartInfo.RedirectStandardOutput = true;
         processStartInfo.WorkingDirectory = @"/Users/takuto";
-        start(url, processStartInfo);
+        YtdlProcess = new Process();
+        YtdlProcess.StartInfo = processStartInfo;
     }
 
-    private async Task start(string url, ProcessStartInfo processStartInfo)
+    public async Task start()
     {
-        using (YtdlProcess = new Process())
+        Console.WriteLine("start!");
+        using (YtdlProcess)
         {
-            YtdlProcess.StartInfo = processStartInfo;
             YtdlProcess.OutputDataReceived += (sender, args) =>
             {
                 Console.WriteLine(args.Data);
             };
             YtdlProcess.Start();
+            YtdlProcess.BeginOutputReadLine();
             YtdlProcess.WaitForExit();
+            Console.WriteLine("終わりました");
         }
     }
 
