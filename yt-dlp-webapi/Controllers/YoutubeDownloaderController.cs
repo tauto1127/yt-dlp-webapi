@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using yt_dlp_webapi.Model;
 
 namespace yt_dlp_webapi.Controllers;
 
@@ -6,19 +7,16 @@ namespace yt_dlp_webapi.Controllers;
 [Route("[controller]/[action]")]
 public class YoutubeDownloaderController : ControllerBase
 {
-    [HttpGet]
-    public IEnumerable<string> GetDownloadList()
-    {
-        return new string[]
-        {
-            "Download2", "Download1",
-        };
-    }
-    
     [HttpGet(Name = "GetDownload")]
     public string Download(string url)
     {
         DownloadProcessManager.AddDownloadProcess(url);
         return "a";
+    }
+
+    [HttpGet]
+    public IEnumerable<DownloadProcessModel> GetDownloadList()
+    { 
+        return DownloadProcessManager.DownloadList.ConvertAll((input => new DownloadProcessModel(input)));
     }
 }
