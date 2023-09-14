@@ -8,15 +8,21 @@ namespace yt_dlp_webapi.Controllers;
 public class YoutubeDownloaderController : ControllerBase
 {
     [HttpGet(Name = "GetDownload")]
-    public string Download(string url)
+    public int Download(string url)
     {
         DownloadProcessManager.AddDownloadProcess(url);
-        return "a";
+        return DownloadProcessManager.DownloadList.Count;
     }
 
     [HttpGet]
     public IEnumerable<DownloadProcessModel> GetDownloadList()
     { 
         return DownloadProcessManager.DownloadList.ConvertAll((input => new DownloadProcessModel(input)));
+    }
+
+    [HttpGet]
+    public float GetDownloadPercentage(int index)
+    {
+        return DownloadProcessManager.DownloadList[index].PercentageOfDownload;
     }
 }

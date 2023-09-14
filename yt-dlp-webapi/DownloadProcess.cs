@@ -8,7 +8,8 @@ public class DownloadProcess
     public Process? YtdlProcess { get; set; }
     public bool IsFinished;
     public string Url;
-    private string PercentageRegex = @"\d+.\d%";
+    public float PercentageOfDownload = 0;
+    private const string PercentageRegex = @"\d+.\d%";
         
     public DownloadProcess(string url)
     {
@@ -32,10 +33,17 @@ public class DownloadProcess
             Console.WriteLine("start!");
             using (YtdlProcess)
             {
+                int i = 1;
                 YtdlProcess.OutputDataReceived += (sender, args) =>
                 {
-                    Console.WriteLine(args.Data);
-                    Console.WriteLine(GetDownloadPercentage(args.Data));
+                    if (args.Data != null)
+                        this.PercentageOfDownload = GetDownloadPercentage(args.Data) ?? this.PercentageOfDownload;
+                    i++;
+                    if (args.Data != null)
+                    {
+                        Console.WriteLine(GetDownloadPercentage(args.Data));
+                        Console.WriteLine(args.Data);
+                    }
                 };
                 YtdlProcess.Start();
                 YtdlProcess.BeginOutputReadLine();
@@ -50,15 +58,16 @@ public class DownloadProcess
         }
     }
 
-    private string GetDownloadPercentage(string line)
+    private float? GetDownloadPercentage(string line)
     {
         try
         {
-            return Regex.Match(line, PercentageRegex).Value;
+            string percentage = Regex.Match(line, PercentageRegex).Value;
+            return float.Parse(percentage.Trim('%'));
         }
         catch (FormatException exception)
         {
-            return "1000";
+            return null;
         }
     }
 
