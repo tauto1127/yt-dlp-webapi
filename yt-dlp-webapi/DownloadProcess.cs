@@ -4,13 +4,18 @@ namespace yt_dlp_webapi;
 
 public class DownloadProcess
 {
-    public Process YtdlProcess { get; set; }
+    public Process? YtdlProcess { get; set; }
+    public bool IsFinished;
+    public string Url;
 
     public DownloadProcess(string url)
     {
+        this.IsFinished = false;
+        this.Url = url;
+        
         ProcessStartInfo processStartInfo = new ProcessStartInfo();
         processStartInfo.FileName = "yt-dlp";
-        processStartInfo.Arguments = ytdlArgGenerator(url);
+        processStartInfo.Arguments = YtdlArgGenerator(url);
         processStartInfo.CreateNoWindow = true;
         processStartInfo.UseShellExecute = false;
         processStartInfo.RedirectStandardOutput = true;
@@ -19,28 +24,38 @@ public class DownloadProcess
         YtdlProcess.StartInfo = processStartInfo;
     }
 
-    public async Task start()
+    public async Task Start()
     {
-        Console.WriteLine("start!");
-        using (YtdlProcess)
+        if (!IsFinished)
         {
-            YtdlProcess.OutputDataReceived += (sender, args) =>
+            Console.WriteLine("start!");
+            using (YtdlProcess)
             {
-                Console.WriteLine(args.Data);
-            };
-            YtdlProcess.Start();
-            YtdlProcess.BeginOutputReadLine();
-            YtdlProcess.WaitForExit();
-            Console.WriteLine("終わりました");
+                YtdlProcess.OutputDataReceived += (sender, args) =>
+                {
+                    Console.WriteLine(args.Data);
+                };
+                YtdlProcess.Start();
+                YtdlProcess.BeginOutputReadLine();
+                YtdlProcess.WaitForExit();
+
+                this.YtdlProcess = null;
+                this.IsFinished = true;
+            }
         }
+        else
+        {
+            throw new NullReferenceException("すでに実行されています");
+        }
+        
     }
 
-    string ytdlArgGenerator(string url)
+    private string YtdlArgGenerator(string url)
     {
-        return $"{addArg(url)}";
+        return $"{AddArg(url)}";
     }
 
-    private string addArg(string arg)
+    private static string AddArg(string arg)
     {
         return arg + " ";
     }

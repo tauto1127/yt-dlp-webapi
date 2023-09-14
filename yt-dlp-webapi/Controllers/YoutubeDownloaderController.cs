@@ -21,7 +21,7 @@ public class YoutubeDownloaderController : ControllerBase
         DownloadProcess downloadProcess = new DownloadProcess(url);
         Task.Run(async () =>
         {
-            downloadProcess.start();
+            downloadProcess.Start();
         });
         return "a";
     }
